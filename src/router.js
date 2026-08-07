@@ -1,4 +1,9 @@
-export function route(input, engines) {
+import { validateInput } from "./validate.js";
+import * as engines from "./engines/index.js";
+
+export async function route(rawInput) {
+  const input = validateInput(rawInput);
+
   switch (input.action) {
     case "SEARCH_RENTALS":
       return engines.searchRentals(input.controls);
