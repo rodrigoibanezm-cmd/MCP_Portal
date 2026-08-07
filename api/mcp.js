@@ -1,7 +1,5 @@
 import { TOOL } from "../src/tool-schema.js";
 import { route } from "../src/router.js";
-import { validateInput } from "../src/validate.js";
-import * as engines from "../src/engines/index.js";
 
 function ok(id, result) {
   return { jsonrpc: "2.0", id, result };
@@ -25,8 +23,7 @@ async function handle(body) {
   if (method === "tools/list") return ok(id, { tools: [TOOL] });
   if (method === "tools/call") {
     if (params?.name !== TOOL.name) return fail(id, -32602, "Unknown tool");
-    const input = validateInput(params?.arguments || {});
-    const data = await route(input, engines);
+    const data = await route(params?.arguments || {});
     return ok(id, {
       content: [{ type: "text", text: JSON.stringify(data) }],
       structuredContent: data
