@@ -1,11 +1,14 @@
 {
   "name": "mcp-portal-inmobiliario",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "MCP personal para consultar propiedades publicadas en Portal Inmobiliario mediante la API de Mercado Libre.",
   "type": "module",
   "scripts": {
     "start": "node index.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1"
   },
   "engines": {
     "node": ">=20"
