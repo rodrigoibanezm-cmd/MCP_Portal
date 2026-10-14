@@ -1,6 +1,6 @@
 export const TOOL = {
   name: "portal_inmobiliario",
-  description: "Consulta departamentos en arriendo en Portal Inmobiliario. Elige una acción y envía solo sus variables de control.",
+  description: "Consulta arriendos y avisos de vehículos usados en Mercado Libre Chile.",
   inputSchema: {
     type: "object",
     additionalProperties: false,
@@ -8,7 +8,7 @@ export const TOOL = {
     properties: {
       action: {
         type: "string",
-        enum: ["SEARCH_RENTALS", "GET_PROPERTY", "AUTH_STATUS"]
+        enum: ["SEARCH_RENTALS", "SEARCH_VEHICLES", "GET_PROPERTY", "AUTH_STATUS"]
       },
       controls: {
         type: "object",
@@ -27,7 +27,13 @@ export const TOOL = {
           area_min: { type: "number", minimum: 0 },
           parking: { type: "boolean" },
           limit: { type: "integer", minimum: 1, maximum: 20 },
-          property_id: { type: "string", minLength: 3 }
+          property_id: { type: "string", minLength: 3 },
+          brand: { type: "string", minLength: 1 },
+          model: { type: "string", minLength: 1 },
+          version: { type: "string", minLength: 1 },
+          year: { type: "integer", minimum: 1900, maximum: 2100 },
+          km: { type: "integer", minimum: 0 },
+          max_pages: { type: "integer", minimum: 1, maximum: 10 }
         }
       }
     },
