@@ -7,6 +7,8 @@ export async function route(rawInput) {
   switch (input.action) {
     case "SEARCH_RENTALS":
       return engines.searchRentals(input.controls);
+    case "SEARCH_VEHICLES":
+      return engines.searchVehicles(input.controls);
     case "GET_PROPERTY":
       return engines.getProperty(input.controls);
     case "AUTH_STATUS":
