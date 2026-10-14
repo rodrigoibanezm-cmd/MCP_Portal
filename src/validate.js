@@ -1,4 +1,4 @@
-const ACTIONS = new Set(["SEARCH_RENTALS", "GET_PROPERTY", "AUTH_STATUS"]);
+const ACTIONS = new Set(["SEARCH_RENTALS", "SEARCH_VEHICLES", "GET_PROPERTY", "AUTH_STATUS"]);
 const CONTROL_KEYS = new Set([
   "communes",
   "price_min",
@@ -8,7 +8,7 @@ const CONTROL_KEYS = new Set([
   "area_min",
   "parking",
   "limit",
-  "property_id"
+  "property_id", "brand", "model", "version", "year", "km", "max_pages"
 ]);
 
 export function validateInput(input) {
@@ -24,6 +24,13 @@ export function validateInput(input) {
   }
   if (input.action === "GET_PROPERTY" && !input.controls.property_id) {
     throw new Error("GET_PROPERTY requires property_id");
+  }
+  if (input.action === "SEARCH_VEHICLES") {
+    const c = input.controls;
+    if (!c.brand || !c.model) throw new Error("SEARCH_VEHICLES requires brand and model");
+    if (c.km != null && (!Number.isInteger(c.km) || c.km < 0)) throw new Error("Invalid km");
+    if (c.year != null && (!Number.isInteger(c.year) || c.year < 1900 || c.year > 2100)) throw new Error("Invalid year");
+    if (c.max_pages != null && (!Number.isInteger(c.max_pages) || c.max_pages < 1 || c.max_pages > 10)) throw new Error("Invalid max_pages");
   }
   if (input.action === "AUTH_STATUS" && Object.keys(input.controls).length) {
     throw new Error("AUTH_STATUS does not accept controls");
