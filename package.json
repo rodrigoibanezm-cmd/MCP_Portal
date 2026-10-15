@@ -1,14 +1,14 @@
 {
   "name": "mcp-portal-inmobiliario",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
-  "description": "MCP personal para consultar propiedades publicadas en Portal Inmobiliario mediante la API de Mercado Libre.",
+  "description": "MCP para consultar propiedades y vehículos en Mercado Libre Chile.",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.1"
+    "pg": "^8.16.3"
   },
   "engines": {
     "node": ">=20"
