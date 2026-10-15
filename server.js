@@ -7,6 +7,7 @@ import oauthCallback from "./api/oauth/callback.js";
 const routes = {"/api/mcp":mcp,"/api/oauth/login":oauthLogin,"/api/oauth/callback":oauthCallback};
 http.createServer(async (request,response)=>{
   const path=new URL(request.url,"http://localhost").pathname;
+  if(path==="/api/mcp" && (!process.env.MCP_API_TOKEN || request.headers.authorization!==`Bearer ${process.env.MCP_API_TOKEN}`)) {response.writeHead(401);response.end("Unauthorized");return;}
   const handler=routes[path];
   if(!handler){response.writeHead(404);response.end("Not found");return;}
   let body;
@@ -16,7 +17,7 @@ http.createServer(async (request,response)=>{
       body=JSON.parse(Buffer.concat(chunks).toString("utf8"));
     }catch {response.writeHead(400);response.end("Invalid JSON");return;}
   }
-  const req=Object.assign(request,{body});
+  const req=Object.assign(request,{body,query:Object.fromEntries(new URL(request.url,"http://localhost").searchParams)});
   const res=Object.assign(response,{
     status(code){response.statusCode=code;return this;},
     json(data){response.setHeader("Content-Type","application/json");response.end(JSON.stringify(data));return this;},
