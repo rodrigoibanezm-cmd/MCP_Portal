@@ -1,10 +1,31 @@
 import http from "node:http";
+import { db } from "./src/services/db.js";
 import { URL } from "node:url";
 import mcp from "./api/mcp.js";
 import oauthLogin from "./api/oauth/login.js";
 import oauthCallback from "./api/oauth/callback.js";
 
 const routes = {"/api/mcp":mcp,"/api/oauth/login":oauthLogin,"/api/oauth/callback":oauthCallback};
+// Idempotent OAuth schema migration, executed before accepting requests.
+await db().query(`
+  CREATE TABLE IF NOT EXISTS public.meli_oauth_tokens (
+    provider TEXT PRIMARY KEY,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )
+`);
+const { rows: [schema] } = await db().query(`
+  SELECT
+    EXISTS (
+      SELECT 1 FROM information_schema.tables
+      WHERE table_schema = 'public' AND table_name = 'meli_oauth_tokens'
+    ) AS exists
+`);
+if (!schema.exists) throw new Error("OAuth token table migration was not applied");
+console.log("OAuth token table verified");
+
 http.createServer(async (request,response)=>{
   const path=new URL(request.url,"http://localhost").pathname;
   if(path==="/api/mcp" && (!process.env.MCP_API_TOKEN || request.headers.authorization!==`Bearer ${process.env.MCP_API_TOKEN}`)) {response.writeHead(401);response.end("Unauthorized");return;}
