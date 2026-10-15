@@ -31,5 +31,6 @@ jobs:
             --image cidefprodacr.azurecr.io/mcp-portal:${{ github.sha }}
           URL=$(az containerapp show -g rg-cidef-prod -n mcp-portal --query properties.configuration.ingress.fqdn -o tsv)
           test -n "$URL"
-          curl --fail --silent --show-error "https://$URL/api/mcp"
+          test -n "${{ secrets.MCP_API_TOKEN }}"
+          curl --fail --silent --show-error -H "Authorization: Bearer ${{ secrets.MCP_API_TOKEN }}" "https://$URL/api/mcp"
           echo "Deployed to https://$URL/api/mcp"
