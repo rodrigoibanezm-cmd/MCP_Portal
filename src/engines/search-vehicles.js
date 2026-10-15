@@ -1,5 +1,4 @@
 import { meliGet } from "../services/meli.js";
-import { resolveVehicleCategory } from "./resolve-vehicle-category.js";
 
 const norm = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 const tokens = (s) => norm(s).split(" ").filter(Boolean);
@@ -24,10 +23,10 @@ function median(values) {
   return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
 }
 export async function searchVehicles(c={}) {
-  const category=await resolveVehicleCategory(), q=[c.brand,c.model,c.year].filter(Boolean).join(" ");
+  const q=[c.brand,c.model,c.year].filter(Boolean).join(" ");
   const seen=new Map(); let queryTotal=null,complete=false;
   for(let page=0;page<(c.max_pages??3);page++){
-    const data=await meliGet("/sites/MLC/search",{category,q,limit:50,offset:page*50});
+    const data=await meliGet("/sites/MLC/search",{q,limit:50,offset:page*50});
     queryTotal=data.paging?.total??queryTotal;
     const results=data.results??[];
     for(const x of results)if(x.id)seen.set(x.id,normalize(x));
