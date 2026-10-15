@@ -28,7 +28,6 @@ console.log("OAuth token table verified");
 
 http.createServer(async (request,response)=>{
   const path=new URL(request.url,"http://localhost").pathname;
-  if(path==="/api/mcp" && (!process.env.MCP_API_TOKEN || request.headers.authorization!==`Bearer ${process.env.MCP_API_TOKEN}`)) {response.writeHead(401);response.end("Unauthorized");return;}
   const handler=routes[path];
   if(!handler){response.writeHead(404);response.end("Not found");return;}
   let body;
