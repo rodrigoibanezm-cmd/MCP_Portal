@@ -16,7 +16,9 @@ export async function meliGet(path, params = {}) {
   });
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data?.message || `Mercado Libre API ${response.status}`);
+    const code = data?.error || data?.code || "unknown";
+    const message = data?.message || "Request rejected";
+    throw new Error(`Mercado Libre ${response.status} (${code}) at ${url.pathname}: ${message}`);
   }
   return data;
 }
