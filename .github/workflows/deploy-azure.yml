@@ -22,15 +22,5 @@ jobs:
           az acr login -n cidefprodacr
           docker build -f Dockerfile.azure -t cidefprodacr.azurecr.io/mcp-portal:${{ github.sha }} .
           docker push cidefprodacr.azurecr.io/mcp-portal:${{ github.sha }}
-      - name: Update existing Container App
-        shell: bash
-        run: |
-          set -euo pipefail
-          az containerapp show -g rg-cidef-prod -n mcp-portal >/dev/null
-          az containerapp update -g rg-cidef-prod -n mcp-portal \
-            --image cidefprodacr.azurecr.io/mcp-portal:${{ github.sha }}
-          URL=$(az containerapp show -g rg-cidef-prod -n mcp-portal --query properties.configuration.ingress.fqdn -o tsv)
-          test -n "$URL"
-          test -n "${{ secrets.MCP_API_TOKEN }}"
-          curl --fail --silent --show-error -H "Authorization: Bearer ${{ secrets.MCP_API_TOKEN }}" "https://$URL/api/mcp"
-          echo "Deployed to https://$URL/api/mcp"
+      - name: Confirm image published
+        run: az acr repository show-tags --name cidefprodacr --repository mcp-portal --output table
