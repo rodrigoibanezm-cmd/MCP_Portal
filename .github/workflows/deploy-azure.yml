@@ -1,0 +1,35 @@
+name: Deploy MCP Portal to Azure
+on:
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          az acr login -n cidefprodacr
+          docker build -f Dockerfile.azure -t cidefprodacr.azurecr.io/mcp-portal:${{ github.sha }} .
+          docker push cidefprodacr.azurecr.io/mcp-portal:${{ github.sha }}
+      - name: Update existing Container App
+        shell: bash
+        run: |
+          set -euo pipefail
+          az containerapp show -g rg-cidef-prod -n mcp-portal >/dev/null
+          az containerapp update -g rg-cidef-prod -n mcp-portal \
+            --image cidefprodacr.azurecr.io/mcp-portal:${{ github.sha }}
+          URL=$(az containerapp show -g rg-cidef-prod -n mcp-portal --query properties.configuration.ingress.fqdn -o tsv)
+          test -n "$URL"
+          curl --fail --silent --show-error "https://$URL/api/mcp"
+          echo "Deployed to https://$URL/api/mcp"
